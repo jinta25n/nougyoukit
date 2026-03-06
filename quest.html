@@ -112,17 +112,19 @@
                 <button class="mission-btn" onclick="completeMission(this)">完了</button>
             </div>
 
-           <div class="mission-item">
-            <div class="mission-info">
-                <span class="mission-title">📷 成長の記録を撮影しよう</span>
-                <span class="mission-reward">報酬: 50 EXP</span>
-                <div id="photoPreviewContainer" style="margin-top: 10px; display: none;">
-                    <img id="photoPreview" src="" alt="プレビュー" style="width: 100%; max-width: 200px; max-height: 150px; object-fit: cover; border-radius: 10px;">
-                <input type="file" id="photoUpload" accept="image/*" style="margin-top: 10px;">
+            <div class="mission-item" id="cameraMissionItem">
+                <div class="mission-info">
+                    <span class="mission-title">📷 成長の記録を撮影しよう</span>
+                    <span class="mission-reward">報酬: 50 EXP</span>
+                    
+                    <div id="photoPreviewContainer" style="margin-top: 10px; display: none;">
+                        <img id="photoPreview" src="" alt="プレビュー" style="width: 100%; max-width: 200px; border-radius: 10px; display: block; margin-bottom: 10px;">
+                    </div>
+                    <input type="file" id="photoUpload" accept="image/*" style="margin-top: 10px; display: block;">
+                </div>
+                <button class="mission-btn" id="cameraBtn" disabled>完了</button>
             </div>
-            <button class="mission-btn" id="cameraBtn" disabled>完了</button>
-        </div>
-            
+
             <div class="mission-item completed">
                 <div class="mission-info">
                     <span class="mission-title">☀️ 朝日を浴びせよう（達成済み）</span>
@@ -178,30 +180,34 @@
     const photoPreviewContainer = document.getElementById('photoPreviewContainer');
     const photoPreview = document.getElementById('photoPreview');
 
-if (photoUpload && cameraBtn) {
-    photoUpload.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
+    if (photoUpload && cameraBtn) {
+        // ファイルが選択された時の処理
+        photoUpload.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                    photoPreviewContainer.style.display = 'block';
+                }
+                reader.readAsDataURL(this.files[0]);
 
-            // 画像の読み込みが完了した時の処理
-            reader.onload = function(e) {
-                photoPreview.src = e.target.result; // 画像のURLを設定
-                photoPreviewContainer.style.display = 'block'; // プレビュー枠を表示
+                // ボタンを使えるようにし、色をアクティブにする
+                cameraBtn.disabled = false;
+                cameraBtn.style.background = "#2d5a27";
             }
+        });
 
-            reader.readAsDataURL(this.files[0]); // ファイルを読み込む
-
-            // ボタンを活性化
-            cameraBtn.disabled = false;
-            cameraBtn.style.background = "#2d5a27";
-            alert("写真を確認しました！プレビューが表示されます。");
-        }
-    });
-
-    cameraBtn.addEventListener('click', function() {
-        completeMission(this);
-    });
-}
+        // 「完了」ボタンを押した時の処理
+        cameraBtn.addEventListener('click', function() {
+            // 他のクエストと同じ共通関数を呼び出す
+            completeMission(this);
+            
+            // 撮影クエスト独自の仕上げ：入力欄を消す
+            photoUpload.style.display = 'none';
+            // ボタンのスタイルを「済」と同じグレーに強制上書き（CSS反映漏れ対策）
+            this.style.background = "#bbb"; 
+        });
+    }
 </script>
 </body>
 </html>
